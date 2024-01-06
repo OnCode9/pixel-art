@@ -1,11 +1,10 @@
 <script setup>
 import { supabase } from './services/supabase'
 import Button from 'primevue/button'
-import HelloWorld from './components/HelloWorld.vue'
 import Cell from './components/Cell.vue'
 
-const numRows = 100
-const numCols = 100
+const numRows = 10
+const numCols = 10
 const size = '.5rem'
 const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
 
@@ -20,10 +19,9 @@ const { data, error } = await supabase
 </script>
 
 <template>
-  <HelloWorld></HelloWorld>
   <Button label="Create Cell" @click="createCell" />
   <div class="grid">
-    <Cell v-for="index in 10000" color="#00FFFF" :size="size"/>
+    <Cell v-for="index in numCols * numRows" color="#FFFFFF" :size="size"/>
   </div>
 </template>
 
@@ -34,5 +32,6 @@ const { data, error } = await supabase
   outline: solid black;
   width: fit-content;
   height: fit-content;
+  margin-top: 1rem;
 }
 </style>
