@@ -1,12 +1,23 @@
 <script setup>
+import { useGridStore } from './stores/gridStore'
 // import { supabase } from './services/supabase'
 import Button from 'primevue/button'
 import Cell from './components/Cell.vue'
 
-const numRows = 50
-const numCols = 50
-const size = '.5rem'
+const gridStore = useGridStore()
+
+const numRows = 3
+const numCols = 3
+const size = '25px'
 const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
+
+function colorFromStore(index) {
+  const row = Math.floor((index - 1) / numRows)
+  const col = (index - 1) % numCols
+  const gridIndex = `${row}-${col}`
+
+  return gridStore.grid[gridIndex].color
+}
 
 // async function createCell() {
 //   console.log('createCell() - start')
@@ -24,9 +35,13 @@ const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
   <ul class="list-disc list-inside">
     <li>Number of rows: {{ numRows }}</li>
     <li>Number of columns: {{ numCols }}</li>
+    <li>Number of cells: {{ gridStore.numCells }}</li>
   </ul>
   <div class="grid">
-    <Cell v-for="index in numCols * numRows" color="#FFFFFF" :size="size"/>
+    <Cell v-for="index in numCols * numRows"
+      :color="colorFromStore(index)"
+      :size="size"
+    />
   </div>
 </template>
 
