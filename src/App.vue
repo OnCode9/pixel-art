@@ -3,6 +3,7 @@ import { useGridStore } from './stores/gridStore'
 // import { supabase } from './services/supabase'
 import Button from 'primevue/button'
 import Cell from './components/Cell.vue'
+import { toRowFromIndex, toColFromIndex } from '@/utils/grid.js'
 
 const gridStore = useGridStore()
 
@@ -12,8 +13,8 @@ const size = '25px'
 const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
 
 function colorFromStore(index) {
-  const row = Math.floor((index - 1) / numRows)
-  const col = (index - 1) % numCols
+  const row = toRowFromIndex(index, numCols)
+  const col = toColFromIndex(index, numCols)
   const gridIndex = `${row}-${col}`
 
   return gridStore.grid[gridIndex].color
