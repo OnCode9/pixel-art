@@ -13,6 +13,14 @@
 
 # Pixel Art
 
+## Tech Stack
+
+- [Vite](https://vitejs.dev/) - Frontend tooling
+- [Vue 3.x](https://vuejs.org/) - Frontend framework
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- [PrimeVue](https://primevue.org/) - UI Component framework
+- [Vitest](https://vitest.dev/) - Testing framework
+
 ## Setup
 
 Note: Use Node version 20
