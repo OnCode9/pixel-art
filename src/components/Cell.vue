@@ -1,12 +1,16 @@
 <script setup>
-import { computed, ref } from "vue"
+import { ref, watch } from "vue"
 import Dropdown from 'primevue/dropdown'
 import OverlayPanel from 'primevue/overlaypanel'
 
 const props = defineProps({
   color: String,
   size: String,
+  row: Number,
+  col: Number,
 })
+
+const emit = defineEmits(['update'])
 
 const validColors = ref([
     { name: 'White', color: '#FFFFF' },
@@ -34,9 +38,16 @@ const opOpened = () => {
   cellBorder.value = 'solid grey'
 }
 
-const cellColor = computed(() => {
-  return selectedColor.value.color
+watch(selectedColor, (newSelectedColor, oldSelectedColor) => {
+  console.log(`the cell color changed to ${newSelectedColor.name}`)
+  emit('update', { row: props.row, col: props.col, color: newSelectedColor.color })
 })
+
+
+// const cellColor = computed(() => {
+//   console.log(`the cell color changed to ${selectedColor.value.name}`)
+//   return selectedColor.value.color
+// })
 
 </script>
 
@@ -51,7 +62,7 @@ const cellColor = computed(() => {
 
 <style scoped>
 .cell {
-  background: v-bind(cellColor);
+  background: v-bind(color);
   width: v-bind(size);
   height: v-bind(size);
   border: v-bind(cellBorder);

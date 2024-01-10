@@ -20,6 +20,10 @@ function colorFromStore(index) {
   return gridStore.grid[gridIndex].color
 }
 
+function updateCell({row, col, color}) {
+  console.log('cell', row, col, color)
+  gridStore.updateCell({row, col, color})
+}
 // async function createCell() {
 //   console.log('createCell() - start')
 
@@ -42,6 +46,9 @@ function colorFromStore(index) {
     <Cell v-for="index in numCols * numRows"
       :color="colorFromStore(index)"
       :size="size"
+      :row="toRowFromIndex(index, numCols)"
+      :col="toColFromIndex(index, numCols)"
+      @update="updateCell"
     />
   </div>
 </template>

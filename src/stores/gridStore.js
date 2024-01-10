@@ -15,9 +15,15 @@ export const useGridStore = defineStore('grid', () => {
     '2-2': { id: 8, created_at: '', row: 2, col: 2, color: '#00FF00' },
   })
 
-  // TODO: Add function to initialize the grid from the supabse database
+  // TODO: Add function to initialize the grid from the supabase database
 
   const numCells = computed(() => Object.keys(grid.value).length)
 
-  return { grid, numCells }
+  function updateCell({row, col, color}) {
+    const index = `${row}-${col}`
+    grid.value[index].color = color
+    // TODO: send new color value to database
+  }
+
+  return { grid, numCells,  updateCell }
 })
