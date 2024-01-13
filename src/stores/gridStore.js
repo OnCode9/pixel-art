@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, readonly, ref } from 'vue'
 
 export const useGridStore = defineStore('grid', () => {
   // This structure matches the database
@@ -25,5 +25,5 @@ export const useGridStore = defineStore('grid', () => {
     // TODO: send new color value to database
   }
 
-  return { grid, numCells,  updateCell }
+  return { grid: readonly(grid), numCells,  updateCell }
 })
