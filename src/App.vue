@@ -6,6 +6,7 @@ import Cell from './components/Cell.vue'
 import { toRowFromIndex, toColFromIndex } from '@/utils/grid.js'
 
 const gridStore = useGridStore()
+gridStore.initialize()
 
 const numRows = 3
 const numCols = 3
@@ -16,26 +17,32 @@ function colorFromStore(index) {
   const row = toRowFromIndex(index, numCols)
   const col = toColFromIndex(index, numCols)
   const gridIndex = `${row}-${col}`
-
-  return gridStore.grid[gridIndex].color
+  const color = gridStore?.grid?.[gridIndex]?.color
+  return (color) ? color : '#FFFFFF'
 }
 
-function updateCell({row, col, color}) {
-  console.log('cell', row, col, color)
-  gridStore.updateCell({row, col, color})
-}
-// async function createCell() {
-//   console.log('createCell() - start')
-
+// async function readSettings() {
 //   const { data, error } = await supabase
-//     .from('cells')
-//     .upsert({ row: 0, col: 1, value: '#424242' })
+//     .from('settings')
 //     .select()
+//   console.log(data)
 // }
+
+async function updateCell({row, col, color}) {
+  
+  const index = `${row}-${col}`
+  if (gridStore?.grid?.[index]) {
+    // console.log('about to update', row, col, color)
+    await gridStore.update({row, col, color})
+  } else {
+    // console.log('about to insert', row, col, color)
+    await gridStore.insert({row, col, color})
+  }
+}
 </script>
 
 <template>
-  <!-- <Button label="Create Cell" @click="createCell" /> -->
+  <!-- <Button label="Read Settings" @click="readSettings" /> -->
   <h1 class="font-medium text-lg">Pixel Art</h1>
   <ul class="list-disc list-inside">
     <li>Number of rows: {{ numRows }}</li>

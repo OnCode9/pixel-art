@@ -7,3 +7,7 @@ export function toColFromIndex(index, numCols, zeroBased = false) {
   const offset = zeroBased ? 0 : 1
   return (index - offset) % numCols
 }
+
+export function toGridIndex({row, col}) {
+  return `row-col`
+}
