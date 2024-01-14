@@ -3,7 +3,11 @@ import {
   expect,
   test,
 } from 'vitest'
-import { toRowFromIndex, toColFromIndex } from '@/utils/grid.js'
+import {
+  toRowFromIndex,
+  toColFromIndex,
+  toGridStoreKey,
+} from '@/utils/grid.js'
 
 describe('@/utils/grid.js', () => {
   describe('toRowFromIndex', () => {
@@ -29,7 +33,7 @@ describe('@/utils/grid.js', () => {
       ${8}     | ${3}      | ${true}      | ${2}
     `('should return $expected for ($index, $numCols, $zeroBased) ', ({ index, numCols, zeroBased, expected }) => {
       expect(toRowFromIndex(index, numCols, zeroBased)).toBe(expected);
-    });
+    })
   })
 
   describe('toColFromIndex', () => {
@@ -55,6 +59,18 @@ describe('@/utils/grid.js', () => {
       ${8}     | ${3}      | ${true}      | ${2}
     `('should return $expected for ($index, $numCols, $zeroBased) ', ({ index, numCols, zeroBased, expected }) => {
       expect(toColFromIndex(index, numCols, zeroBased)).toBe(expected);
-    });
+    })
+  })
+
+  describe('toGridStoreKey', () => {
+    test.each`
+      row    | col    | expected
+      ${0}   | ${0}   | ${'0-0'}
+      ${9}   | ${3}   | ${'9-3'}
+      ${17}  | ${101} | ${'17-101'}
+      ${777} | ${502} | ${'777-502'}
+    `('should return $expected for a row of $row and col of $col ', ({ row, col, expected }) => {
+      expect(toGridStoreKey({ row, col })).toBe(expected);
+    })
   })
 })

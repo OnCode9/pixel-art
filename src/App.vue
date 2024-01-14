@@ -3,7 +3,12 @@ import { useGridStore } from './stores/gridStore'
 // import { supabase } from './services/supabase'
 import Button from 'primevue/button'
 import Cell from './components/Cell.vue'
-import { toRowFromIndex, toColFromIndex } from '@/utils/grid.js'
+import {
+  toRowFromIndex,
+  toColFromIndex,
+  toGridStoreKey,
+  DEFAULT_COLOR
+} from '@/utils/grid.js'
 
 const gridStore = useGridStore()
 gridStore.initialize()
@@ -16,9 +21,9 @@ const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
 function colorFromStore(index) {
   const row = toRowFromIndex(index, numCols)
   const col = toColFromIndex(index, numCols)
-  const gridIndex = `${row}-${col}`
-  const color = gridStore?.grid?.[gridIndex]?.color
-  return (color) ? color : '#FFFFFF'
+  const key = toGridStoreKey({ row, col })
+  const color = gridStore?.grid?.[key]?.color
+  return (color) ? color : DEFAULT_COLOR
 }
 
 // async function readSettings() {
@@ -29,9 +34,9 @@ function colorFromStore(index) {
 // }
 
 async function updateCell({row, col, color}) {
-  
-  const index = `${row}-${col}`
-  if (gridStore?.grid?.[index]) {
+  const key = toGridStoreKey({ row, col })
+
+  if (gridStore?.grid?.[key]) {
     // console.log('about to update', row, col, color)
     await gridStore.update({row, col, color})
   } else {

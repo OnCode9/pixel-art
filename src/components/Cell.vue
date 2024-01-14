@@ -42,13 +42,6 @@ watch(selectedColor, (newSelectedColor, oldSelectedColor) => {
   console.log(`the cell color changed to ${newSelectedColor.name}`)
   emit('update', { row: props.row, col: props.col, color: newSelectedColor.color })
 })
-
-
-// const cellColor = computed(() => {
-//   console.log(`the cell color changed to ${selectedColor.value.name}`)
-//   return selectedColor.value.color
-// })
-
 </script>
 
 <template>
