@@ -13,7 +13,7 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const validColors = ref([
-    { name: 'White', color: '#FFFFF' },
+    { name: 'White', color: '#FFFFFF' },
     { name: 'Blue', color: '#0000FF' },
     { name: 'Red', color: '#FF0000' },
     { name: 'Green', color: '#00FF00' },
