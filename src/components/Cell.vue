@@ -13,11 +13,12 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const validColors = ref([
-    { name: 'White', color: '#FFFFFF' },
-    { name: 'Blue', color: '#0000FF' },
-    { name: 'Red', color: '#FF0000' },
-    { name: 'Green', color: '#00FF00' },
-    { name: 'Black', color: '#000000' }
+  { name: 'White', color: '#FFFFFF' },
+  { name: 'Blue', color: '#0000FF' },
+  { name: 'Red', color: '#FF0000' },
+  { name: 'Green', color: '#00FF00' },
+  { name: 'Black', color: '#000000' },
+  { name: 'Purple', color: '#BF40BF' },
 ])
 
 const selectedColor = ref(validColors.value.find(item => item.color === props.color) || validColors.value[0])
