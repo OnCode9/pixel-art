@@ -18,7 +18,7 @@ const validColors = ref([
   { name: 'Red', color: '#FF0000' },
   { name: 'Green', color: '#00FF00' },
   { name: 'Black', color: '#000000' },
-  { name: 'Purple', color: '#BF40BF' },
+  { name: 'Purple', color: '#800080' },
 ])
 
 const selectedColor = ref(validColors.value.find(item => item.color === props.color) || validColors.value[0])
