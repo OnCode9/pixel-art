@@ -13,11 +13,12 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 
 const validColors = ref([
-    { name: 'White', color: '#FFFFF' },
-    { name: 'Blue', color: '#0000FF' },
-    { name: 'Red', color: '#FF0000' },
-    { name: 'Green', color: '#00FF00' },
-    { name: 'Black', color: '#000000' }
+  { name: 'White', color: '#FFFFFF' },
+  { name: 'Blue', color: '#0000FF' },
+  { name: 'Red', color: '#FF0000' },
+  { name: 'Green', color: '#00FF00' },
+  { name: 'Black', color: '#000000' },
+  { name: 'Purple', color: '#800080' },
 ])
 
 const selectedColor = ref(validColors.value.find(item => item.color === props.color) || validColors.value[0])
@@ -42,13 +43,6 @@ watch(selectedColor, (newSelectedColor, oldSelectedColor) => {
   console.log(`the cell color changed to ${newSelectedColor.name}`)
   emit('update', { row: props.row, col: props.col, color: newSelectedColor.color })
 })
-
-
-// const cellColor = computed(() => {
-//   console.log(`the cell color changed to ${selectedColor.value.name}`)
-//   return selectedColor.value.color
-// })
-
 </script>
 
 <template>
