@@ -12,6 +12,7 @@ export const useGridStore = defineStore('grid', () => {
   const grid = ref({})
 
   async function initialize() {
+    grid.value = {}
     const cells = await fetchGrid()
 
     cells.forEach((cell) => {
@@ -22,16 +23,29 @@ export const useGridStore = defineStore('grid', () => {
 
   const numCells = computed(() => Object.keys(grid.value).length)
 
-  async function update({row, col, color}) {
-    const key = toGridStoreKey({ row, col })
-    grid.value[key].color = color
-    await updateCell({ id: grid.value[key].id, color})
+  async function update(cell) {
+    const key = toGridStoreKey({ row: cell.row, col: cell.col })
+    grid.value[key].color = cell.color
   }
 
-  async function insert({row, col, color}) {
-    const key = toGridStoreKey({ row, col })
-    grid.value[key] = await insertCell({ row, col, color })
+  async function insert(cell) {
+    const key = toGridStoreKey({ row: cell.row, col: cell.col })
+    grid.value[key] = cell
   }
 
-  return { grid: readonly(grid), initialize, numCells, insert, update }
+  function remove(id) {
+    let removalKey = ''
+    for (const [key, value] of Object.entries(grid.value)) {
+      if (id === value.id) {
+        removalKey = key
+        break
+      }
+    }
+
+    if (removalKey !== '') {
+      delete grid.value[removalKey]
+    }
+  }
+
+  return { grid: readonly(grid), initialize, numCells, insert, update, remove }
 })

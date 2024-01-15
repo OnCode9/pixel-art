@@ -1,6 +1,11 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useGridStore } from './stores/gridStore'
-// import { supabase } from './services/supabase'
+import {
+  insertCell,
+  updateCell,
+  subscribeToCellsChange,
+} from './services/supabase'
 import Button from 'primevue/button'
 import Cell from './components/Cell.vue'
 import {
@@ -10,13 +15,37 @@ import {
   DEFAULT_COLOR
 } from '@/utils/grid.js'
 
+let cellsSubscription = ref()
 const gridStore = useGridStore()
-gridStore.initialize()
 
 const numRows = 3
 const numCols = 3
 const size = '25px'
 const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
+
+onMounted(() => {
+  cellsSubscription = subscribeToCellsChange(onInsert, onUpdate, onDelete)
+  gridStore.initialize()
+})
+
+onUnmounted(() => {
+  cellsSubscription.unsubscribe()
+})
+
+function onInsert(payload) {
+  console.log('onInsert()', payload)
+  gridStore.insert(payload.new)
+}
+
+function onUpdate(payload) {
+  console.log('onUpdate()', payload)
+  gridStore.update(payload.new)
+}
+
+function onDelete(payload) {
+  console.log('onDelete()', payload)
+  gridStore.remove(payload.old.id)
+}
 
 function colorFromStore(index) {
   const row = toRowFromIndex(index, numCols)
@@ -33,15 +62,13 @@ function colorFromStore(index) {
 //   console.log(data)
 // }
 
-async function updateCell({row, col, color}) {
+async function upsertDatabase({row, col, color}) {
   const key = toGridStoreKey({ row, col })
 
   if (gridStore?.grid?.[key]) {
-    // console.log('about to update', row, col, color)
-    await gridStore.update({row, col, color})
+    await updateCell({ id: gridStore?.grid?.[key].id, color })
   } else {
-    // console.log('about to insert', row, col, color)
-    await gridStore.insert({row, col, color})
+    await insertCell({ row, col, color })
   }
 }
 </script>
@@ -60,7 +87,7 @@ async function updateCell({row, col, color}) {
       :size="size"
       :row="toRowFromIndex(index, numCols)"
       :col="toColFromIndex(index, numCols)"
-      @update="updateCell"
+      @update="upsertDatabase"
     />
   </div>
 </template>
