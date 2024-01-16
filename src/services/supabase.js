@@ -16,7 +16,7 @@ export async function insertCell({row, col, color}) {
     .from('cells')
     .insert({row, col, color})
     .select()
-  // console.log(data[0])
+
   return data[0]
 }
 
@@ -24,6 +24,15 @@ export async function fetchGrid() {
   const { data, error } = await supabase
     .from('cells')
     .select()
-  // console.log(data)
+
   return data
+}
+
+export function subscribeToCellsChange(onInsert, onUpdate, onDelete) {
+  return supabase
+    .channel('cells-changes')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cells' }, onInsert)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cells' }, onUpdate)
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'cells' }, onDelete)
+    .subscribe()
 }
