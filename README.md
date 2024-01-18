@@ -1,5 +1,8 @@
 <div align="center">
-
+  <a href="https://pixel-art.davefollett.dev" target="_blank" rel="noopener noreferrer">
+    <img width="250" src="pixel-art-logo.png" alt="Pixel Art logo">
+  </a>
+  <br/>
   <a href="https://vuejs.org/">
     <img src="https://img.shields.io/badge/vue.js-3.4-blue.svg" alt="Vue.js 3.4">
   </a>
@@ -21,6 +24,8 @@
 - [PrimeVue](https://primevue.org/) - UI Component framework
 - [PrimeIcons](https://primevue.org/icons/) - Icons
 - [Vitest](https://vitest.dev/) - Testing framework
+- Cloudflare Pages
+- Supabase
 
 ## Setup
 
