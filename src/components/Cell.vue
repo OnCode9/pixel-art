@@ -8,19 +8,10 @@ const props = defineProps({
   size: String,
   row: Number,
   col: Number,
+  validColors: Array,
 })
 
 const emit = defineEmits(['update'])
-
-// Dropdown objects.  Maybe this should move to the database.
-const validColors = ref([
-  { name: 'White', color: '#FFFFFF' },
-  { name: 'Blue', color: '#0000FF' },
-  { name: 'Red', color: '#FF0000' },
-  { name: 'Green', color: '#00FF00' },
-  { name: 'Black', color: '#000000' },
-  { name: 'Purple', color: '#800080' },
-])
 
 // Figure out what the initial dropdown value is
 const selectedColor = ref(determineValidColor(props.color))
@@ -42,7 +33,7 @@ const opOpened = () => {
 }
 
 function determineValidColor(color) {
-  return validColors.value.find(item => item.color === color) || validColors.value[0]
+  return props.validColors.find(item => item.color === color) || props.validColors[0]
 }
 
 // Watch the prop.color and update the dropdown selection when it changes
@@ -62,7 +53,7 @@ watch(selectedColor, (newSelectedColor, oldSelectedColor) => {
   <div class="cell" @click="toggle">
     <OverlayPanel ref="op" showCloseIcon @show="opOpened" @hide="opClosed">
       <p>{{ color }}</p>
-      <Dropdown v-model="selectedColor" :options="validColors" optionLabel="name" @change="toggle"/>
+      <Dropdown v-model="selectedColor" :options="props.validColors" optionLabel="name" @change="toggle"/>
     </OverlayPanel>
   </div>
 </template>
