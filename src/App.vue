@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
+import ProgressSpinner from 'primevue/progressspinner'
 import { useGridStore } from './stores/gridStore'
 import {
   insertCell,
   updateCell,
   subscribeToCellsChange,
 } from './services/supabase'
-import Button from 'primevue/button'
 import Cell from './components/Cell.vue'
 import {
   toRowFromIndex,
@@ -15,54 +15,59 @@ import {
   DEFAULT_COLOR
 } from '@/utils/grid.js'
 
-let cellsSubscription = ref()
+let cellsSubscription
 const gridStore = useGridStore()
 
-const numRows = 3
-const numCols = 3
 const size = '25px'
-const cssGridColumnTemplate = `repeat(${numCols}, ${size})`
 
-onMounted(() => {
+onMounted(async () => {
   cellsSubscription = subscribeToCellsChange(onInsert, onUpdate, onDelete)
-  gridStore.initialize()
+  await gridStore.initialize()
 })
 
 onUnmounted(() => {
+  console.log('unmount')
+  gridStore.isInitialized = false
   cellsSubscription.unsubscribe()
 })
 
+const cssGridColumnTemplate = computed(() => {
+  if (gridStore.isInitialized) {
+    return `repeat(${gridStore.settings.num_cols}, ${size})`
+  } else {
+    return 'unset'
+  }
+})
+
 function onInsert(payload) {
+  if (!gridStore.isInitialized) { return }
   console.log('onInsert()', payload)
   gridStore.insert(payload.new)
 }
 
 function onUpdate(payload) {
+  if (!gridStore.isInitialized) { return }
   console.log('onUpdate()', payload)
   gridStore.update(payload.new)
 }
 
 function onDelete(payload) {
+  if (!gridStore.isInitialized) { return }
   console.log('onDelete()', payload)
   gridStore.remove(payload.old.id)
 }
 
 function colorFromStore(index) {
-  const row = toRowFromIndex(index, numCols)
-  const col = toColFromIndex(index, numCols)
+  if (!gridStore.isInitialized) { return }
+  const row = toRowFromIndex(index, gridStore.settings.num_cols)
+  const col = toColFromIndex(index, gridStore.settings.num_cols)
   const key = toGridStoreKey({ row, col })
   const color = gridStore?.grid?.[key]?.color
   return (color) ? color : DEFAULT_COLOR
 }
 
-// async function readSettings() {
-//   const { data, error } = await supabase
-//     .from('settings')
-//     .select()
-//   console.log(data)
-// }
-
 async function upsertDatabase({row, col, color}) {
+  if (!gridStore.isInitialized) { return }
   const key = toGridStoreKey({ row, col })
 
   if (gridStore?.grid?.[key]) {
@@ -74,21 +79,30 @@ async function upsertDatabase({row, col, color}) {
 </script>
 
 <template>
-  <!-- <Button label="Read Settings" @click="readSettings" /> -->
   <h1 class="font-medium text-lg">Pixel Art</h1>
   <ul class="list-disc list-inside">
-    <li>Number of rows: {{ numRows }}</li>
-    <li>Number of columns: {{ numCols }}</li>
+    <li>Number of rows: {{ gridStore.settings.num_rows }}</li>
+    <li>Number of columns: {{ gridStore.settings.num_cols }}</li>
     <li>Number of cells: {{ gridStore.numCells }}</li>
   </ul>
-  <div class="grid">
-    <Cell v-for="index in numCols * numRows"
+  <div
+    class="grid"
+    v-if="gridStore.isInitialized"
+  >
+    <Cell v-for="index in gridStore.settings.num_cols * gridStore.settings.num_rows"
       :color="colorFromStore(index)"
       :size="size"
-      :row="toRowFromIndex(index, numCols)"
-      :col="toColFromIndex(index, numCols)"
+      :row="toRowFromIndex(index, gridStore.settings.num_cols)"
+      :col="toColFromIndex(index, gridStore.settings.num_cols)"
+      :validColors="gridStore.settings.valid_colors"
       @update="upsertDatabase"
     />
+  </div>
+  <div
+    class="card flex justify-content-center"
+    v-else
+  >
+    <ProgressSpinner />
   </div>
 </template>
 

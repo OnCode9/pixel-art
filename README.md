@@ -19,6 +19,7 @@
 - [Vue 3.x](https://vuejs.org/) - Frontend framework
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [PrimeVue](https://primevue.org/) - UI Component framework
+- [PrimeIcons](https://primevue.org/icons/) - Icons
 - [Vitest](https://vitest.dev/) - Testing framework
 
 ## Setup
