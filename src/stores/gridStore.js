@@ -1,8 +1,9 @@
-import { defineStore, acceptHMRUpdate } from 'pinia'
+import { defineStore } from 'pinia'
 import { computed, readonly, ref } from 'vue'
 import {
   fetchGrid,
   fetchSettings,
+  subscribeToCellsChange,
   insertCell,
   updateCell
 } from '@/services/supabase'
@@ -13,9 +14,13 @@ export const useGridStore = defineStore('grid', () => {
   const grid = ref({})
   const settings = ref({})
   let isInitialized = ref(false)
+  let cellsSubscription
 
   async function initialize() {
     console.log('initializing the grid')
+
+    cellsSubscription = subscribeToCellsChange(onInsert, onUpdate, onDelete)
+
     grid.value = {}
     const cells = await fetchGrid()
 
@@ -30,24 +35,36 @@ export const useGridStore = defineStore('grid', () => {
     isInitialized.value = true
   }
 
+  function uninitialize() {
+    isInitialized.value = false
+    cellsSubscription.unsubscribe()
+  }
+
   const numCells = computed(() => Object.keys(grid.value).length)
 
-  async function update(cell) {
-    console.log('updating grid cell')
-    const key = toGridStoreKey({ row: cell.row, col: cell.col })
-    grid.value[key].color = cell.color
-  }
-
-  async function insert(cell) {
+  async function onInsert(payload) {
+    if (!isInitialized.value) { return }
     console.log('inserting grid cell')
-    const key = toGridStoreKey({ row: cell.row, col: cell.col })
-    grid.value[key] = cell
+
+    const key = toGridStoreKey({ row: payload.new.row, col: payload.new.col })
+    grid.value[key] = payload.new
   }
 
-  function remove(id) {
+  async function onUpdate(payload) {
+    if (!isInitialized.value) { return }
+    console.log('updating grid cell')
+
+    const key = toGridStoreKey({ row: payload.new.row, col: payload.new.col })
+    grid.value[key].color = payload.new.color
+  }
+
+  function onDelete(payload) {
+    if (!isInitialized.value) { return }
+    console.log('deleting grid cell')
+
     let removalKey = ''
     for (const [key, value] of Object.entries(grid.value)) {
-      if (id === value.id) {
+      if (payload.old.id === value.id) {
         removalKey = key
         break
       }
@@ -60,16 +77,10 @@ export const useGridStore = defineStore('grid', () => {
 
   return {
     grid: readonly(grid),
-    isInitialized,
+    isInitialized: readonly(isInitialized),
     settings: readonly(settings),
     initialize,
+    uninitialize,
     numCells,
-    insert,
-    update,
-    remove
   }
 })
-
-if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(useGridStore, import.meta.hot))
-}
