@@ -2,11 +2,6 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useGridStore } from './stores/gridStore'
-import {
-  insertCell,
-  updateCell,
-  subscribeToCellsChange,
-} from './services/supabase'
 import Cell from './components/Cell.vue'
 import {
   toRowFromIndex,
@@ -15,20 +10,17 @@ import {
   DEFAULT_COLOR
 } from '@/utils/grid.js'
 
-let cellsSubscription
 const gridStore = useGridStore()
 
 const size = '25px'
 
 onMounted(async () => {
-  cellsSubscription = subscribeToCellsChange(onInsert, onUpdate, onDelete)
   await gridStore.initialize()
 })
 
 onUnmounted(() => {
   console.log('unmount')
-  gridStore.isInitialized = false
-  cellsSubscription.unsubscribe()
+  gridStore.uninitialize()
 })
 
 const cssGridColumnTemplate = computed(() => {
@@ -39,24 +31,6 @@ const cssGridColumnTemplate = computed(() => {
   }
 })
 
-function onInsert(payload) {
-  if (!gridStore.isInitialized) { return }
-  console.log('onInsert()', payload)
-  gridStore.insert(payload.new)
-}
-
-function onUpdate(payload) {
-  if (!gridStore.isInitialized) { return }
-  console.log('onUpdate()', payload)
-  gridStore.update(payload.new)
-}
-
-function onDelete(payload) {
-  if (!gridStore.isInitialized) { return }
-  console.log('onDelete()', payload)
-  gridStore.remove(payload.old.id)
-}
-
 function colorFromStore(index) {
   if (!gridStore.isInitialized) { return }
   const row = toRowFromIndex(index, gridStore.settings.num_cols)
@@ -66,16 +40,6 @@ function colorFromStore(index) {
   return (color) ? color : DEFAULT_COLOR
 }
 
-async function upsertDatabase({row, col, color}) {
-  if (!gridStore.isInitialized) { return }
-  const key = toGridStoreKey({ row, col })
-
-  if (gridStore?.grid?.[key]) {
-    await updateCell({ id: gridStore?.grid?.[key].id, color })
-  } else {
-    await insertCell({ row, col, color })
-  }
-}
 </script>
 
 <template>
@@ -95,7 +59,7 @@ async function upsertDatabase({row, col, color}) {
       :row="toRowFromIndex(index, gridStore.settings.num_cols)"
       :col="toColFromIndex(index, gridStore.settings.num_cols)"
       :validColors="gridStore.settings.valid_colors"
-      @update="upsertDatabase"
+      @update="gridStore.upsert"
     />
   </div>
   <div
