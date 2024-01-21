@@ -16,6 +16,13 @@ export const useGridStore = defineStore('grid', () => {
   let isInitialized = ref(false)
   let cellsSubscription
 
+  /**
+   * Initializes the grid store by doing the following:
+   * - subscribes to realtime database updates
+   * - fetches the grid data from the database
+   * - fetches the grid settings from the database
+   * - sets the internal state to be initialized 
+   */
   async function initialize() {
     console.log('initializing the grid')
 
@@ -35,13 +42,18 @@ export const useGridStore = defineStore('grid', () => {
     isInitialized.value = true
   }
 
-  function uninitialize() {
-    isInitialized.value = false
-    cellsSubscription.unsubscribe()
-  }
-
+  /**
+   * Stores the number of cells in the grid with a color value.
+   */
   const numCells = computed(() => Object.keys(grid.value).length)
 
+  /**
+   * Insertion handler for realtime events from the database.  When called, a new cell will be added
+   * to the grid store.
+   *
+   * @param {Object} payload 
+   * @returns Empty if the grid store is not initialized.
+   */
   async function onInsert(payload) {
     if (!isInitialized.value) { return }
     console.log('inserting grid cell')
@@ -50,6 +62,13 @@ export const useGridStore = defineStore('grid', () => {
     grid.value[key] = payload.new
   }
 
+  /**
+   * Update handler for realtime events from the database.  When called, the cell will have its
+   * color updated.
+   *
+   * @param {Object} payload 
+   * @returns Empty if the grid store is not initialized.
+   */
   async function onUpdate(payload) {
     if (!isInitialized.value) { return }
     console.log('updating grid cell')
@@ -58,6 +77,13 @@ export const useGridStore = defineStore('grid', () => {
     grid.value[key].color = payload.new.color
   }
 
+  /**
+   * Delete handler for realtime events from the database.  When called, the cell will removed from
+   * the grid store.
+   *
+   * @param {Object} payload 
+   * @returns Empty if the grid store is not initialized.
+   */
   function onDelete(payload) {
     if (!isInitialized.value) { return }
     console.log('deleting grid cell')
@@ -75,12 +101,40 @@ export const useGridStore = defineStore('grid', () => {
     }
   }
 
+  /**
+   * Uninitializes the grid store by doing the following:
+   * - unsubscribes to realtime database updates
+   * - sets the internal state to be not initialized
+   */
+  function uninitialize() {
+    isInitialized.value = false
+    cellsSubscription.unsubscribe()
+  }
+
+  /**
+   * Upserts the provided cell object to the database.
+   *
+   * @param {Object} cell The cell to upsert { row, col, color }
+   * @returns Empty if the grid store is not initialized.
+   */
+  async function upsert({ row, col, color }) {
+    if (!isInitialized.value) { return }
+    const key = toGridStoreKey({ row, col })
+  
+    if (grid.value[key]) {
+      await updateCell({ id: grid.value[key].id, color })
+    } else {
+      await insertCell({ row, col, color })
+    }
+  }
+
   return {
     grid: readonly(grid),
     isInitialized: readonly(isInitialized),
     settings: readonly(settings),
     initialize,
     uninitialize,
+    upsert,
     numCells,
   }
 })

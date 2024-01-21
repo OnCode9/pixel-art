@@ -2,10 +2,6 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useGridStore } from './stores/gridStore'
-import {
-  insertCell,
-  updateCell,
-} from './services/supabase'
 import Cell from './components/Cell.vue'
 import {
   toRowFromIndex,
@@ -44,16 +40,6 @@ function colorFromStore(index) {
   return (color) ? color : DEFAULT_COLOR
 }
 
-async function upsertDatabase({row, col, color}) {
-  if (!gridStore.isInitialized) { return }
-  const key = toGridStoreKey({ row, col })
-
-  if (gridStore?.grid?.[key]) {
-    await updateCell({ id: gridStore?.grid?.[key].id, color })
-  } else {
-    await insertCell({ row, col, color })
-  }
-}
 </script>
 
 <template>
@@ -73,7 +59,7 @@ async function upsertDatabase({row, col, color}) {
       :row="toRowFromIndex(index, gridStore.settings.num_cols)"
       :col="toColFromIndex(index, gridStore.settings.num_cols)"
       :validColors="gridStore.settings.valid_colors"
-      @update="upsertDatabase"
+      @update="gridStore.upsert"
     />
   </div>
   <div
