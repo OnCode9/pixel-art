@@ -1,0 +1,23 @@
+@baseUrl = http://localhost:8788
+
+###
+GET {{baseUrl}}/api/insert
+
+###
+POST {{baseUrl}}/api/insert
+Content-Type: application/json
+
+{
+  "row": 0,
+  "col": 1,
+  "color": "#FF0000"
+}
+
+###
+POST {{baseUrl}}/update
+Content-Type: application/json
+
+{
+  "id": 0,
+  "color": "#0000FF"
+}
