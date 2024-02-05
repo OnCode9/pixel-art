@@ -31,7 +31,14 @@
 
 Note: Use Node version 20
 ```
+# setup environment variables
+cp .env.example .env
+cp .dev.vars.example .dev.vars
+
+# install dependencies
 npm ci
+
+# launch the frontend and functions
 npm run dev
 
 ```

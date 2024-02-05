@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently npm:dev:frontend npm:dev:api",
+    "dev": "concurrently -c 'bgBlue.bold,bgGray.bold' npm:dev:frontend npm:dev:api",
     "dev:frontend": "vite",
     "dev:api": "npx wrangler pages dev functions --compatibility-date=2024-01-31",
     "build": "vite build",

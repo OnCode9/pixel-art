@@ -9,9 +9,9 @@ export async function onRequestPost(context) {
     tablePrefix: env.VITE_TABLE_PREFIX
   })
 
-  const requestData = await request.json()
-  console.log('INSERT REQUEST', requestData)
-  const databaseResponse = await client.insertCell(requestData)
+  const requestData = await request.json();
+  console.log('UPDATE REQUEST', requestData)
+  const databaseResponse = await client.updateCell(requestData)
 
   return new Response(
     JSON.stringify(databaseResponse),
