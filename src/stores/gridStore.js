@@ -1,12 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, readonly, ref } from 'vue'
-import {
-  fetchGrid,
-  fetchSettings,
-  subscribeToCellsChange,
-  insertCell,
-  updateCell
-} from '@/services/supabase'
+import Supabase from '@/services/supabase'
+import { insertCell, updateCell } from '@/services/pixelArtApi'
 import { toGridStoreKey } from '@/utils/grid.js'
 
 export const useGridStore = defineStore('grid', () => {
@@ -14,6 +9,11 @@ export const useGridStore = defineStore('grid', () => {
   const grid = ref({})
   const settings = ref({})
   let isInitialized = ref(false)
+  const client = new Supabase({
+    url: import.meta.env.VITE_SUPABASE_URL,
+    key: import.meta.env.VITE_SUPABASE_KEY_READONLY,
+    tablePrefix: import.meta.env.VITE_TABLE_PREFIX
+  })
   let cellsSubscription
 
   /**
@@ -26,10 +26,10 @@ export const useGridStore = defineStore('grid', () => {
   async function initialize() {
     console.log('initializing the grid')
 
-    cellsSubscription = subscribeToCellsChange(onInsert, onUpdate, onDelete)
+    cellsSubscription = client.subscribeToCellsChange(onInsert, onUpdate, onDelete)
 
     grid.value = {}
-    const cells = await fetchGrid()
+    const cells = await client.fetchGrid()
 
     cells.forEach((cell) => {
       const key = toGridStoreKey({ row: cell.row, col: cell.col })
@@ -37,7 +37,7 @@ export const useGridStore = defineStore('grid', () => {
     })
 
     console.log('fetching settings')
-    settings.value = await fetchSettings()
+    settings.value = await client.fetchSettings()
     
     isInitialized.value = true
   }
@@ -112,7 +112,7 @@ export const useGridStore = defineStore('grid', () => {
   }
 
   /**
-   * Upserts the provided cell object to the database.
+   * Upsert the provided cell object to the database.
    *
    * @param {Object} cell The cell to upsert { row, col, color }
    * @returns Empty if the grid store is not initialized.
