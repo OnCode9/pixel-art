@@ -9,7 +9,9 @@ export async function updateCell({id, color}) {
     },
     body: JSON.stringify({id, color})
   })
+
   const data = await response.json()
+
   console.log('UPDATE RESP', data)
   return data
 }
@@ -23,7 +25,9 @@ export async function insertCell({row, col, color}) {
     },
     body: JSON.stringify({ row, col, color })
   })
+
   const data = await response.json()
+
   console.log('INSERT RESP', data)
   return data
 }

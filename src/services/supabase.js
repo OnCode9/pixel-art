@@ -13,22 +13,22 @@ export default class Supabase {
 
   async updateCell({id, color}) {
     console.log('updateCell', id, color)
-    const { error } = await this.#supabaseClient
+    return await this.#supabaseClient
       .from(this.#cells)
       .update({ color: color })
       .eq('id', id)
+      .select()
   }
 
   async insertCell({row, col, color}) {
     console.log('insertCell')
-    const { data, error } = await this.#supabaseClient
+    return await this.#supabaseClient
       .from(this.#cells)
       .insert({row, col, color})
       .select()
-
-    return data[0]
   }
 
+  // TODO: update to return the entire object from the supabase client
   async fetchGrid() {
     const { data, error } = await this.#supabaseClient
       .from(this.#cells)
